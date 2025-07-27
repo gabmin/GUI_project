@@ -1,54 +1,57 @@
-from PyQt5.QtWidgets import (
-    QMainWindow, QPushButton, QTextEdit, QVBoxLayout,QMessageBox,
-    QWidget, QLabel, QHBoxLayout
-)
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
+from PyQt5 import QtCore, QtGui, QtWidgets
 from api.openai_api import get_image_description
 from utils.file_handler import get_image_file, encode_image_to_base64
 from utils.config import DB_PATH
 import sqlite3
 
-class MainWindow(QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("OpenAI 이미지 설명 프로그램")
         self.setGeometry(100, 100, 700, 500)
         self.image_path = None
-        self.init_ui()
+        self.init_ui(self)
         self.init_db()
 
-    def init_ui(self):
-        self.image_label = QLabel("이미지를 불러오세요")
-        self.image_label.setFixedSize(300, 300)
-        self.image_label.setAlignment(Qt.AlignCenter)
-        self.image_label.setStyleSheet("border: 1px solid black;")
+    def init_ui(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(900, 800)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(40, 50, 300, 300))
+        self.label.setStyleSheet("border: 1px solid black;")
+        self.label.setText("")
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
+        self.label.setObjectName("label")
+        self.plainTextEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.plainTextEdit.setGeometry(QtCore.QRect(40, 400, 300, 30))
+        self.plainTextEdit.setObjectName("plainTextEdit")
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton.setGeometry(QtCore.QRect(35, 450, 310, 41))
+        self.pushButton.setObjectName("pushButton")
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setGeometry(QtCore.QRect(40, 20, 71, 16))
+        self.label_2.setObjectName("label_2")
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setGeometry(QtCore.QRect(40, 370, 101, 16))
+        self.label_3.setObjectName("label_3")
+        self.label_4 = QtWidgets.QLabel(self.centralwidget)
+        self.label_4.setGeometry(QtCore.QRect(370, 50, 500, 700))
+        self.label_4.setStyleSheet("border: 1px solid black")
+        self.label_4.setText("")
+        self.label_4.setObjectName("label_4")
+        MainWindow.setCentralWidget(self.centralwidget)
 
-        self.load_button = QPushButton("이미지 열기")
-        self.load_button.clicked.connect(self.load_image)
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        self.text_input = QTextEdit()
-        self.text_input.setPlaceholderText("GPT에게 보낼 추가 프롬프트 입력")
-
-        self.result_output = QTextEdit()
-        self.result_output.setReadOnly(True)
-
-        self.generate_button = QPushButton("GPT 설명 생성")
-        self.generate_button.clicked.connect(self.generate_description)
-
-        top_layout = QHBoxLayout()
-        top_layout.addWidget(self.image_label)
-        top_layout.addWidget(self.load_button)
-
-        layout = QVBoxLayout()
-        layout.addLayout(top_layout)
-        layout.addWidget(self.text_input)
-        layout.addWidget(self.generate_button)
-        layout.addWidget(self.result_output)
-
-        container = QWidget()
-        container.setLayout(layout)
-        self.setCentralWidget(container)
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.pushButton.setText(_translate("MainWindow", "검색하기"))
+        self.label_2.setText(_translate("MainWindow", "매장 사진"))
+        self.label_3.setText(_translate("MainWindow", "식당 검색 링크"))
 
     def init_db(self):
         conn = sqlite3.connect(DB_PATH)
@@ -69,7 +72,7 @@ class MainWindow(QMainWindow):
         try:
             path = get_image_file()
             if path:
-                pixmap = QPixmap(path).scaled(self.image_label.width(), self.image_label.height(), Qt.KeepAspectRatio)
+                pixmap = QtGui.QPixmap(path).scaled(self.image_label.width(), self.image_label.height(), QtCore.Qt.KeepAspectRatio)
                 if pixmap.isNull():
                     raise ValueError("이미지를 불러올 수 없습니다.")
                 self.image_label.setPixmap(pixmap)
