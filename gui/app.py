@@ -25,9 +25,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.main_title.setStyleSheet("font-size: 24px")
         self.main_title.setObjectName("label_2")
 
-        self.label_3 = QtWidgets.QLabel(self.centralwidget)
-        self.label_3.setGeometry(QtCore.QRect(40, 70, 300, 40))
-        self.label_3.setObjectName("label_3")
+        self.description = QtWidgets.QLabel(self.centralwidget)
+        self.description.setGeometry(QtCore.QRect(40, 70, 300, 40))
+        self.description.setObjectName("label_3")
 
         self.image_label = QtWidgets.QLabel(self.centralwidget)
         self.image_label.setGeometry(QtCore.QRect(40, 120, 300, 300))
@@ -56,6 +56,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.money_contents = QtWidgets.QLabel(self.centralwidget)
         self.money_contents.setGeometry(QtCore.QRect(380, 110, 290, 70))
         self.money_contents.setStyleSheet("background-color: #f0f0f0; border: 1px solid #b2b2b2; border-radius: 3px")
+        self.money_contents.setWordWrap(True)
+        self.money_contents.setAlignment(QtCore.Qt.AlignTop)
         self.money_contents.setObjectName("textEdit")
 
         self.love_title = QtWidgets.QLabel(self.centralwidget)
@@ -66,6 +68,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.love_contents = QtWidgets.QLabel(self.centralwidget)
         self.love_contents.setGeometry(QtCore.QRect(380, 230, 290, 70))
         self.love_contents.setStyleSheet("background-color: #f0f0f0; border: 1px solid #b2b2b2; border-radius: 3px")
+        self.love_contents.setWordWrap(True)
+        self.love_contents.setAlignment(QtCore.Qt.AlignTop)
         self.love_contents.setObjectName("textEdit_2")
 
         self.health_title = QtWidgets.QLabel(self.centralwidget)
@@ -76,6 +80,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.health_contents = QtWidgets.QLabel(self.centralwidget)
         self.health_contents.setGeometry(QtCore.QRect(380, 350, 290, 70))
         self.health_contents.setStyleSheet("background-color: #f0f0f0; border: 1px solid #b2b2b2; border-radius: 3px")
+        self.health_contents.setWordWrap(True)
+        self.health_contents.setAlignment(QtCore.Qt.AlignTop)
         self.health_contents.setObjectName("textEdit_3")
 
         self.summary_title = QtWidgets.QLabel(self.centralwidget)
@@ -86,6 +92,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.summary_contents = QtWidgets.QLabel(self.centralwidget)
         self.summary_contents.setGeometry(QtCore.QRect(380, 470, 290, 70))
         self.summary_contents.setStyleSheet("background-color: #f0f0f0; border: 1px solid #b2b2b2; border-radius: 3px")
+        self.summary_contents.setWordWrap(True)
+        self.summary_contents.setAlignment(QtCore.Qt.AlignTop)
         self.summary_contents.setObjectName("textEdit_4")
 
         MainWindow.setCentralWidget(self.centralwidget)
@@ -99,7 +107,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.request_button.setText(_translate("MainWindow", "결과 보기"))
         self.main_title.setText(_translate("MainWindow", "재미로 보는 관상 테스트"))
         self.image_upload_button.setText(_translate("MainWindow", "이미지 등록하기"))
-        self.label_3.setText(_translate("MainWindow", "이미지를 등록해서 AI에게 관상 테스트를 받아보세요."))
+        self.description.setText(_translate("MainWindow", "이미지를 등록해서 AI에게 관상 테스트를 받아보세요."))
         self.money_title.setText(_translate("MainWindow", "재물운"))
         self.love_title.setText(_translate("MainWindow", "연애운"))
         self.health_title.setText(_translate("MainWindow", "건강운"))
