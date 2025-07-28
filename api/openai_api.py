@@ -1,9 +1,12 @@
 import base64
+from PyQt5.QtWidgets import QMessageBox
 from openai import OpenAI
 from utils.config import OPENAI_API_KEY
 from utils.file_handler import encode_image_to_base64
 import re
 import json
+import sqlite3
+from utils.config import DB_PATH
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
@@ -14,7 +17,7 @@ def request_info_description(image_path, prompt):
         base64_image = base64.b64encode(image_data).decode("utf-8")
 
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[
                 {
                     "role": "user",
@@ -29,7 +32,7 @@ def request_info_description(image_path, prompt):
                     ]
                 }
             ],
-            max_tokens=300
+            max_tokens=3000
         )
 
         return response.choices[0].message.content
@@ -39,51 +42,66 @@ def request_info_description(image_path, prompt):
 
 def generate_description(self):
     if not self.image_path:
-        self.result_output.setPlainText("이미지를 먼저 불러와 주세요.")
+        QMessageBox.warning(self, "오류", "이미지를 등록해주세요!!")
         return
 
     prompt = f"""
-                이 이미지는 가상의 인물 캐릭터입니다.
-                관상 전문가로서, 동양 관상학적인 기준에 따라 이 인물의 성향을 분석해주세요.
-                재미로 보려고 하는거니까 너무 정확할 필요없이 적당하게 분석해주세요.
-                조금 더 길게 전문가처럼 분석해주세요.
+                당신은 요리 전문가입니다.
 
-                다음 항목을 포함해서 JSON 형식으로 분석해 주세요:
+                {self.image_path}를 분석해서 재료를 파악하고,
 
-                1. 재물운
-                2. 연애운
-                3. 건강운
-                4. 전체 요약 (200자 이내)
+                다음 재료를 사용하여 만들 수 있는 요리 레시피 1개를 JSON 형식으로 제시해주세요.
+
+                형식은 다음과 같이 맞춰주세요:
 
                 {{
-                "money": "...",
-                "love": "...",
-                "health": "...",
-                "summary": "..."
+                "ingredients_name": "재료명",
+                "recipe": {{
+                    "name": "요리 이름",
+                    "ingredients": ["재료1", "재료2", "..."],
+                    "steps": [
+                    "1단계 설명",
+                    "2단계 설명",
+                    "3단계 설명"
+                    ]
                 }}
-                """
+                }}
+
+                요리법은 3000토큰 한도 내에서 최대한 자세하게 설명해주세요.
+                응답은 순수 JSON 형식으로만 출력해 주세요. 백틱(```)이나 기타 마크다운 문법 없이 출력해 주세요.
+            """
 
     try:
-        base64_image = encode_image_to_base64(self.image_path)
         result = request_info_description(self.image_path, prompt)
 
-        matched_data = re.search(r'```json\s*(\{.*?\})\s*```', result, re.DOTALL)
-        if matched_data:
-            json_str = matched_data.group(1)
-            parsed_data = json.loads(json_str)
-            self.money_contents.setText(parsed_data["money"])
-            self.love_contents.setText(parsed_data["love"])
-            self.health_contents.setText(parsed_data["health"])
-            self.summary_contents.setText(parsed_data["summary"])
+        if result:
+            data = json.loads(result)
+            print(type(data), data)
+            ingredient = data.get("ingredients_name", "알 수 없음")
+            recipe = data.get("recipe", [])
 
-        # with sqlite3.connect(DB_PATH) as conn:
-        #     cursor = conn.cursor()
-        #     with open(self.image_path, "rb") as f:
-        #         image_blob = f.read()
-        #     cursor.execute('''
-        #         INSERT INTO image_logs (image, prompt, response) VALUES (?, ?, ?)
-        #     ''', (image_blob, prompt, result))
-        #     conn.commit()
+            formatted = f"<b>재료:</b> {ingredient}<br><br>"
+
+            formatted += f"<b>1. {recipe.get('name', '알 수 없는 요리')}</b><br>"
+            formatted += f"<u>재료:</u> {', '.join(recipe.get('ingredients', []))}<br>"
+            formatted += "<u>요리법:</u><br>"
+            for step_num, step in enumerate(recipe.get('steps', []), 1):
+                formatted += f"&nbsp;&nbsp;{step_num}. {step}<br>"
+
+            self.result_label.setText(formatted)
+        else:
+            QMessageBox.warning(self, "오류", "이미지를 이해하지 못했습니다. 다른 이미지를 등록해주세요.")
+            return
+
+        with sqlite3.connect(DB_PATH) as conn:
+            cursor = conn.cursor()
+            with open(self.image_path, "rb") as f:
+                image_blob = f.read()
+            cursor.execute('''
+                INSERT INTO recipe_logs (ingredients_name, image, recipe_description) VALUES (?, ?, ?)
+            ''', (ingredient, image_blob, formatted))
+            conn.commit()
 
     except Exception as e:
-        self.result_output.setPlainText(f"응답 오류 발생: {e}")
+        print(e)
+        QMessageBox.warning(self, "오류", "오류가 발생했습니다. 다시 시도해주세요.")
