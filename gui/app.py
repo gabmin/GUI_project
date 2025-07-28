@@ -36,11 +36,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.upload_button = QtWidgets.QPushButton(self.centralwidget)
         self.upload_button.setGeometry(QtCore.QRect(60, 470, 300, 40))
         self.upload_button.setStyleSheet("border-radius: 3px; border: 1px solid rgb(178, 177, 179)")
+        self.upload_button.setCursor(QtCore.Qt.PointingHandCursor)
         self.upload_button.clicked.connect(lambda: load_image(self))
 
         self.request_button = QtWidgets.QPushButton(self.centralwidget)
         self.request_button.setGeometry(QtCore.QRect(60, 530, 300, 40))
         self.request_button.setStyleSheet("border-radius: 3px; border: 1px solid rgb(178, 177, 179)")
+        self.request_button.setCursor(QtCore.Qt.PointingHandCursor)
         self.request_button.clicked.connect(lambda: generate_description(self))
 
         self.result_label = QtWidgets.QLabel(self.centralwidget)
