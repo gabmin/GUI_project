@@ -5,11 +5,11 @@ def init_db(self):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS image_logs (
+        CREATE TABLE IF NOT EXISTS recipe_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ingredients_name TEXT,
             image BLOB,
-            prompt TEXT,
-            response TEXT,
+            recipe_description TEXT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
